@@ -2,19 +2,19 @@ import { Office } from "./OfficeService";
 import restClient from "./RestClient";
 
 export class Role {
-    constructor(public id: string, public name: string) {}
+    constructor(public id: string, public name: string) { }
 }
 
 export class UserRole {
-    constructor(public id: string, public role: Role) {}
+    constructor(public id: string, public role: Role) { }
 }
 
 export class User {
     constructor(
         public id: string,
-        public office: Office, 
-        public login: string, 
-        public roles: UserRole[]) {}
+        public office: Office,
+        public login: string,
+        public roles: UserRole[]) { }
 }
 
 export class UserService {
@@ -24,7 +24,8 @@ export class UserService {
             ids += element + ','
         });
 
-        restClient.get<User[]>("users/getUsers", {officeIds: ids})
+         //add the return statement
+        return restClient.get<User[]>("users/getUsers", { officeIds: ids })
     }
 }
 

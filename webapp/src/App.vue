@@ -1,88 +1,94 @@
 <template>
-  <div v-if="users != null && users.length == 0">
-    <input
-      type="text"
-      placeholder="Search office by address"
-      v-model="searchPattern"
-    />
-    <button @click="onOfficeSearch">Search</button>
-    <button @click="onUserSearch">Get Users</button>
-    <div class="user-list">
-      <div v-for="office in offices" v-bind:key="office.id">
-        <div>
-          <input
-            type="checkbox"
-            :checked="selectedOffices.indexOf(office.id) >= 0"
-            @click="onSelectOffice(office.id)"
-          />
-          Address: <span class="bold"> {{ office.address }} </span>
+    <div v-if="users != null && users.length == 0">
+        <input type="text"
+               placeholder="Search office by address"
+               v-model="searchPattern" />
+        <button @click="onOfficeSearch">Search</button>
+        <button @click="onUserSearch">Get Users</button>
+        <div class="user-list">
+            <div v-for="office in offices" v-bind:key="office.id">
+                <div>
+                    <input type="checkbox"
+                           :checked="selectedOffices.indexOf(office.id) >= 0"
+                           @click="onSelectOffice(office.id)" />
+                    Address: <span class="bold"> {{ office.address }} </span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <div v-if="users.length > 0">
-    <UserList :users="users" />
-  </div>
+    <div v-if="users.length > 0">
+        <UserList :users="users" />
+    </div>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
-import UserList from "./components/UserList.vue";
-import officeService, { Office } from "./services/OfficeService";
-import userService, { User } from "./services/UserService";
+    //Separate the Script, Css, Html in independent files.
 
-export default {
-  components: { UserList },
-  setup() {
-    let searchPattern = ref("");
-    let offices = ref([] as Office[]);
-    let selectedOffices = ref([] as string[]);
-    let users = ref([] as User[]);
+    import { ref } from "vue";
+    import UserList from "./components/UserList.vue";
+    import officeService, { Office } from "./services/OfficeService";
+    import userService, { User } from "./services/UserService";
 
-    function onOfficeSearch() {
-      officeService
-        .getOffices(searchPattern.value)
-        ?.then((o) => (offices.value = o));
-    }
+    export default {
+        components: { UserList },
+        setup() {
+            let searchPattern = ref("");
+            let offices = ref([] as Office[]);
+            let selectedOffices = ref([] as string[]);
+            let users = ref([] as User[]);
 
-    function onUserSearch() {
-        users.value = userService.getUsers(selectedOffices.value);
-    }
+            //The ? operator is not neccesary 
+            function onOfficeSearch() {
+                officeService
+                    .getOffices(searchPattern.value)
+                    .then(o => offices.value = o);
+            }
 
-    function onSelectOffice(id: string) {
-      if (selectedOffices.value.indexOf(id) >= 0) {
-        selectedOffices.value = selectedOffices.value.filter((o) => o != id);
-      } else {
-        selectedOffices.value.push(id);
-      }
-    }
+            function onUserSearch() {
+                //Assign the correct value
+                userService.getUsers(selectedOffices.value)
+                    .then(u => (users.value = u))
+                //.catch(u => alert())
+            }
 
-    return {
-      searchPattern,
-      offices,
-      users,
-      selectedOffices,
-      onOfficeSearch,
-      onUserSearch,
-      onSelectOffice,
+            function onSelectOffice(id: string) {
+                if (selectedOffices.value.indexOf(id) >= 0) {
+                    selectedOffices.value = selectedOffices.value.filter((o) => o != id);
+                } else {
+                    selectedOffices.value.push(id);
+                }
+            }
+
+            return {
+                searchPattern,
+                offices,
+                users,
+                selectedOffices,
+                onOfficeSearch,
+                onUserSearch,
+                onSelectOffice,
+            };
+
+        },
     };
-  },
-};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-.bold {
-  font-weight: bold;
-}
-.user-list {
-  text-align: left;
-}
+    /*Separate the Script, Css, Html in independent files.*/
+    #app {
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 60px;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .user-list {
+        text-align: left;
+    }
 </style>
